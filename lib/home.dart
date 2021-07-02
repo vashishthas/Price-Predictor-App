@@ -14,7 +14,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String _finalLocation = "";
   String _finalBath = "1";
   String _finalBhk = "1";
-  final ScrollController scrollController = ScrollController();
+  // final ScrollController scrollController = ScrollController();
   String estimatedPrice = "";
   Map data = {};
   double _currentSlidervalue1 = 1.0;
@@ -29,7 +29,9 @@ class _MyHomePageState extends State<MyHomePage> {
             key: _formKey,
             child: Container(
               height: MediaQuery.of(context).size.height,
-              color: Colors.black.withOpacity(0.2),
+              color:
+                  // Colors.blueGrey,
+                  Colors.black.withOpacity(0.3),
               // decoration: BoxDecoration(
               //   gradient: LinearGradient(
               //     begin: FractionalOffset.topCenter,
@@ -43,7 +45,7 @@ class _MyHomePageState extends State<MyHomePage> {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    SizedBox(height: 40),
+                    SizedBox(height: 65),
                     Text(
                       "Banglore Home Price",
                       style:
@@ -60,35 +62,39 @@ class _MyHomePageState extends State<MyHomePage> {
                             style: TextStyle(
                                 fontWeight: FontWeight.w700, fontSize: 25),
                           ),
-                          TextFormField(
-                            controller: _areaController,
-                            keyboardType: TextInputType.number,
-                            inputFormatters: [
-                              FilteringTextInputFormatter.digitsOnly
-                            ],
-                            style: TextStyle(
-                              color: Colors.black,
-                              // fontWeight: FontWeight.w900,
-                              fontFamily: 'Roboto',
-                              fontSize: 21,
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 25.0),
+                            child: TextFormField(
+                              controller: _areaController,
+                              keyboardType: TextInputType.number,
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly
+                              ],
+                              style: TextStyle(
+                                color: Colors.black,
+                                // fontWeight: FontWeight.w900,
+                                fontFamily: 'Roboto',
+                                fontSize: 21,
+                              ),
+                              decoration: InputDecoration(
+                                  hintText: "Area in sqft",
+                                  hintStyle: TextStyle(
+                                      // fontWeight: FontWeight.w900,
+                                      fontFamily: 'Roboto',
+                                      fontSize: 18)),
+                              validator: (value) {
+                                print(value);
+                                if (value!.isEmpty) // || value==(/^[0-9]+$/))
+                                  return "Enter area";
+                                if (int.parse(value) < 800) {
+                                  return "Cannot be less than 800";
+                                }
+                              },
                             ),
-                            decoration: InputDecoration(
-                                hintText: "Area in sqft",
-                                hintStyle: TextStyle(
-                                    // fontWeight: FontWeight.w900,
-                                    fontFamily: 'Roboto',
-                                    fontSize: 18)),
-                            validator: (value) {
-                              print(value);
-                              if (value!.isEmpty) // || value==(/^[0-9]+$/))
-                                return "Enter area";
-                              if (int.parse(value) < 800) {
-                                return "Cannot be less than 800";
-                              }
-                            },
                           ),
                           SizedBox(
-                            height: 20,
+                            height: 23,
                           ),
                           // Text(
                           //   "Location",
@@ -211,7 +217,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               label: _finalBhk,
                             ),
                           ),
-                          SizedBox(height:20),
+                          SizedBox(height: 15),
                           // DropdownButtonFormField(
                           //     hint: Text("Bhk"),
                           //     onChanged: (newValue) {
@@ -258,25 +264,31 @@ class _MyHomePageState extends State<MyHomePage> {
                           SizedBox(
                             height: 20,
                           ),
-
                           ElevatedButton(
-                              onPressed: () {
-                                print(_finalBath.toString());
-                                if (_formKey.currentState!.validate()) {
-                                  data = {
-                                    "location": _finalLocation,
-                                    "bhk": _finalBhk,
-                                    "bath": _finalBath,
-                                    "total_sqft": _areaController.text.trim()
-                                  };
-                                  setState(() {
-                                    loadPrice();
-                                    // estimatedPrice=snapshot.data!;
-                                  });
-                                }
-                                // ApiService().getPrice(data);
-                              },
-                              child: Text('Predict Price')),
+                            onPressed: () {
+                              print(_finalBath.toString());
+                              if (_formKey.currentState!.validate()) {
+                                data = {
+                                  "location": _finalLocation,
+                                  "bhk": _finalBhk,
+                                  "bath": _finalBath,
+                                  "total_sqft": _areaController.text.trim()
+                                };
+                                setState(() {
+                                  loadPrice();
+                                  // estimatedPrice=snapshot.data!;
+                                });
+                              }
+                              // ApiService().getPrice(data);
+                            },
+                            child: Text('Predict Price',
+                                style: TextStyle(color: Colors.black)),
+                          ),
+                          SizedBox(height:20),
+                          Text(estimatedPrice,
+                          style: TextStyle(
+                            fontWeight: FontWeight.w700, fontSize: 20
+                          ),)
                         ],
                       ),
                     ),
@@ -291,10 +303,13 @@ class _MyHomePageState extends State<MyHomePage> {
   loadPrice() async {
     String estPrice = await ApiService().getPrice(data);
     if (estPrice != 'Some error occured') {
-      estPrice = 'The estimated price is ' + estPrice + ' lakhs';
+      estPrice = 'The estimated price is ' + estPrice + ' lakhs.';
     }
     print(estPrice);
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text('$estPrice')));
+    // ScaffoldMessenger.of(context)
+    //     .showSnackBar(SnackBar(content: Text('$estPrice')));
+    setState(() {
+      estimatedPrice = estPrice;
+    });
   }
 }
